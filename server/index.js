@@ -1,5 +1,6 @@
 const express = require('express');
 const https = require('https');
+const http = require('http'); 
 const fs = require('fs');
 const path = require('path');
 const { Server } = require('socket.io');
@@ -17,18 +18,26 @@ app.use(express.json());
 const flightRoutes = require('./routes/flightRoutes');
 const authRoutes = require('./routes/authRoutes');
 
-//console.log('Tipul lui flightRoutes:', typeof flightRoutes, flightRoutes);
-//console.log('Tipul lui authRoutes:', typeof authRoutes, authRoutes);
-
 app.use('/api/auth', authRoutes);
 app.use('/api/flights', flightRoutes);
 
-const sslOptions = {
-  key: fs.readFileSync(path.join(__dirname, 'key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))
-};
+const IS_RENDER = process.env.PORT || process.env.RENDER;
+const PORT = process.env.PORT || 3001;
 
-const server = https.createServer(sslOptions, app);
+let server;
+
+if (IS_RENDER) {
+    server = http.createServer(app);
+    console.log('☁️ Server configurat în mod CLOUD (HTTP Proxy).');
+} else {
+    const sslOptions = {
+        key: fs.readFileSync(path.join(__dirname, 'key.pem')),
+        cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))
+    };
+    server = https.createServer(sslOptions, app);
+    console.log('💻 Server configurat în mod LOCAL (HTTPS).');
+}
+
 const io = new Server(server, { cors: { origin: "*" } });
 
 let generatorInterval = null;
@@ -90,20 +99,22 @@ app.all('/api/flights/sync', async (req, res) => {
 const syncDB = async () => {
     try {
         await sequelize.authenticate();
-        console.log('SQL Server connected.');
+        console.log('Database connected successfully.');
         
-        await sequelize.sync({ force: true }); 
+        await sequelize.sync({ alter: true }); 
         console.log('Database synced.');
 
-        const testPlane = await Plane.create({ model: 'Boeing 737', capacity: 180 });
-       
-        await Flight.create({
-            id: "12345", 
-            destination: "Cluj-Napoca",
-            pilot: "Capitanul Andrei",
-            PlaneId: testPlane.id
-        });
-        console.log('Test data created.');
+        let testPlane = await Plane.findOne();
+        if (!testPlane) {
+            testPlane = await Plane.create({ model: 'Boeing 737', capacity: 180 });
+            await Flight.create({
+                id: "12345", 
+                destination: "Cluj-Napoca",
+                pilot: "Capitanul Andrei",
+                PlaneId: testPlane.id
+            });
+            console.log('Initial test data created.');
+        }
     } catch (err) {
         console.error('Database connection error:', err);
     }
@@ -111,8 +122,8 @@ const syncDB = async () => {
 
 if (process.env.NODE_ENV !== 'test') {
     syncDB();
-    server.listen(3001, () => {
-        console.log('Server running on port 3001');
+    server.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
     });
 }
 
