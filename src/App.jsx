@@ -34,11 +34,11 @@ function App() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || data.message || 'A apărut o eroare la autentificare');
+        throw new Error(data.error || data.message || 'An error occurred during authentication');
       }
 
       if (isRegisterMode) {
-        alert('Cont creat cu succes! Acum te poți conecta.');
+        alert('Account successfully created! You can now log in.');
         setIsRegisterMode(false);
         setPasswordInput('');
       } else {
@@ -67,7 +67,7 @@ function App() {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
         handleLogout();
-        alert('Ați fost deconectat automat din cauza inactivității!');
+        alert('You have been automatically logged out due to inactivity!');
       }, INACTIVITY_LIMIT);
     };
 
@@ -155,7 +155,7 @@ function App() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5' }}>
         <div style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', width: '340px' }}>
           <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#1a1a1a' }}>
-            {isRegisterMode ? '✈️ Înregistrare Calypso' : '✈️ Conectare Calypso'}
+            {isRegisterMode ? '✈️ Sign In' : '✈️ Connect'}
           </h2>
           
           {authError && (
@@ -166,24 +166,24 @@ function App() {
 
           <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: 'bold', color: '#5f6368' }}>Utilizator</label>
-              <input type="text" placeholder="Introduceți username-ul" value={usernameInput} onChange={e => setUsernameInput(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #dadce0', boxSizing: 'border-box' }} />
+              <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: 'bold', color: '#5f6368' }}>User</label>
+              <input type="text" placeholder="Enter the username" value={usernameInput} onChange={e => setUsernameInput(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #dadce0', boxSizing: 'border-box' }} />
             </div>
             
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: 'bold', color: '#5f6368' }}>Parolă</label>
-              <input type="password" placeholder="Minim 6 caractere" value={passwordInput} onChange={e => setPasswordInput(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #dadce0', boxSizing: 'border-box' }} />
+              <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: 'bold', color: '#5f6368' }}>Password</label>
+              <input type="password" placeholder="At least 6 characters" value={passwordInput} onChange={e => setPasswordInput(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #dadce0', boxSizing: 'border-box' }} />
             </div>
 
             <button type="submit" style={{ width: '100%', padding: '12px', background: '#1a73e8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', marginTop: '10px' }}>
-              {isRegisterMode ? 'Creează Cont Nou' : 'Autentificare'}
+              {isRegisterMode ? 'Create new account' : 'Authentication'}
             </button>
           </form>
 
           <p style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px', color: '#5f6368' }}>
-            {isRegisterMode ? 'Ai deja un cont creat?' : 'Nu ai un cont pe platformă?'} {' '}
+            {isRegisterMode ? 'Do you already have an account?' : 'You do not have an account on the platform?'} {' '}
             <span onClick={() => { setIsRegisterMode(!isRegisterMode); setAuthError(''); }} style={{ color: '#1a73e8', cursor: 'pointer', fontWeight: 'bold', textDecoration: 'underline' }}>
-              {isRegisterMode ? 'Conectează-te' : 'Înregistrează-te'}
+              {isRegisterMode ? 'Connect' : 'Register'}
             </span>
           </p>
         </div>
@@ -198,7 +198,7 @@ function App() {
         
         {}
         <button onClick={handleLogout} style={{ position: 'absolute', right: '10px', top: '5px', padding: '5px 12px', backgroundColor: '#d93025', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
-          Deconectare
+          Logout
         </button>
       </div>
 
