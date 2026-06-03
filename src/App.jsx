@@ -5,7 +5,7 @@ import MasterTable from './components/MasterTable.jsx';
 import DetailView from './components/DetailView.jsx';
 import { initialFlights } from './data/flights.js';
 
-const BACKEND_URL = 'https://calypso-backend-6jr6.onrender.com';
+const BACKEND_URL = window.location.hostname.includes('onrender.com') ? 'https://calypso-backend-6jr6.onrender.com' : `https://${window.location.hostname}:3001`;
 const socket = io(BACKEND_URL);
 
 function App() {
@@ -111,7 +111,7 @@ function App() {
   const syncOfflineData = () => {
     const offlineFlights = JSON.parse(localStorage.getItem('offline_flights') || '[]');
     if (offlineFlights.length > 0) {
-      fetch('https://localhost:3001/api/flights/sync', {
+      fetch(`${BACKEND_URL}/api/flights/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(offlineFlights)
@@ -122,8 +122,8 @@ function App() {
     }
   };
 
-  const startGenerator = () => fetch('https://localhost:3001/api/generator/start', { method: 'POST' });
-  const stopGenerator = () => fetch('https://localhost:3001/api/generator/stop', { method: 'POST' });
+  const startGenerator = () => fetch(`${BACKEND_URL}/api/generator/start`, { method: 'POST' });
+  const stopGenerator = () => fetch(`${BACKEND_URL}/api/generator/stop`, { method: 'POST' });
 
   const eraseFlight = (id) => {
     setFlights(flights.filter(f => f.id !== id));
