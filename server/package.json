@@ -1,0 +1,38 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "jsonwebtoken": "^9.0.3",
+    "mssql": "^12.5.4",
+    "selfsigned": "^5.5.0",
+    "sequelize": "^6.37.8",
+    "socket.io": "^4.8.3",
+    "tedious": "^19.2.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@faker-js/faker$": "<rootDir>/node_modules/@faker-js/faker/dist/cjs/index.js"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!@faker-js/faker)"
+    ]
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.2.2"
+  }
+}

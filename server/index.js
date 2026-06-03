@@ -1,0 +1,119 @@
+const express = require('express');
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
+const { Server } = require('socket.io');
+const cors = require('cors');
+
+const sequelize = require('./database');
+const Flight = require('./models/Flight');
+const Plane = require('./models/Plane');
+const User = require('./models/User');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const flightRoutes = require('./routes/flightRoutes');
+const authRoutes = require('./routes/authRoutes');
+
+//console.log('Tipul lui flightRoutes:', typeof flightRoutes, flightRoutes);
+//console.log('Tipul lui authRoutes:', typeof authRoutes, authRoutes);
+
+app.use('/api/auth', authRoutes);
+app.use('/api/flights', flightRoutes);
+
+const sslOptions = {
+  key: fs.readFileSync(path.join(__dirname, 'key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))
+};
+
+const server = https.createServer(sslOptions, app);
+const io = new Server(server, { cors: { origin: "*" } });
+
+let generatorInterval = null;
+
+app.post('/api/generator/start', (req, res) => {
+    if (!generatorInterval) {
+        console.log('✈️ Generatorul de zboruri a fost pornit...');
+        
+        generatorInterval = setInterval(async () => {
+            try {
+                const { faker } = require('@faker-js/faker');
+                
+                const id = Math.floor(10000 + Math.random() * 90000).toString();
+                const destination = faker.airline ? faker.airline.airport().name : faker.location.city();
+                const pilot = faker.person.fullName();
+
+                const testPlane = await Plane.findOne();
+                const planeId = testPlane ? testPlane.id : null;
+
+                const noulZbor = await Flight.create({
+                    id,
+                    destination,
+                    pilot,
+                    status: 'On Time',
+                    PlaneId: planeId
+                });
+
+                io.emit('flight-created', noulZbor);
+                io.emit('flight_added', noulZbor);
+                io.emit('flight', noulZbor);
+
+                console.log(`[Generator] Zbor generat cu succes: ${id} către ${destination}`);
+            } catch (err) {
+                console.error('Eroare în generator la crearea zborului:', err.message);
+            }
+        }, 5000); 
+    }
+    res.json({ success: true, message: 'Generator started' });
+});
+
+app.post('/api/generator/stop', (req, res) => {
+    if (generatorInterval) {
+        clearInterval(generatorInterval);
+        generatorInterval = null;
+        console.log('🛑 Generatorul de zboruri a fost oprit.');
+    }
+    res.json({ success: true, message: 'Generator stopped' });
+});
+
+app.all('/api/flights/sync', async (req, res) => {
+    try {
+        const zboruri = await Flight.findAll({ include: Plane });
+        res.json(zboruri);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+const syncDB = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('SQL Server connected.');
+        
+        await sequelize.sync({ force: true }); 
+        console.log('Database synced.');
+
+        const testPlane = await Plane.create({ model: 'Boeing 737', capacity: 180 });
+       
+        await Flight.create({
+            id: "12345", 
+            destination: "Cluj-Napoca",
+            pilot: "Capitanul Andrei",
+            PlaneId: testPlane.id
+        });
+        console.log('Test data created.');
+    } catch (err) {
+        console.error('Database connection error:', err);
+    }
+};
+
+if (process.env.NODE_ENV !== 'test') {
+    syncDB();
+    server.listen(3001, () => {
+        console.log('Server running on port 3001');
+    });
+}
+
+module.exports = { app, server };
