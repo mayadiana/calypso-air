@@ -155,7 +155,7 @@ function App() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5' }}>
         <div style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', width: '340px' }}>
           <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#1a1a1a' }}>
-            {isRegisterMode ? '✈️ Sign In' : '✈️ Connect'}
+            {isRegisterMode ? '✈️ Sign In to Calypso Air' : '✈️ Connect to Calypso Air'}
           </h2>
           
           {authError && (
@@ -176,12 +176,12 @@ function App() {
             </div>
 
             <button type="submit" style={{ width: '100%', padding: '12px', background: '#1a73e8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', marginTop: '10px' }}>
-              {isRegisterMode ? 'Create new account' : 'Authentication'}
+              {isRegisterMode ? 'Create new account' : 'Log in'}
             </button>
           </form>
 
           <p style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px', color: '#5f6368' }}>
-            {isRegisterMode ? 'Do you already have an account?' : 'You do not have an account on the platform?'} {' '}
+            {isRegisterMode ? 'Already have an account?' : "Don't have an account?"} {' '}
             <span onClick={() => { setIsRegisterMode(!isRegisterMode); setAuthError(''); }} style={{ color: '#1a73e8', cursor: 'pointer', fontWeight: 'bold', textDecoration: 'underline' }}>
               {isRegisterMode ? 'Connect' : 'Register'}
             </span>
