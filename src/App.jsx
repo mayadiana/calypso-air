@@ -5,7 +5,7 @@ import MasterTable from './components/MasterTable.jsx';
 import DetailView from './components/DetailView.jsx';
 import { initialFlights } from './data/flights.js';
 
-const BACKEND_URL = 'https://calypso-backend-6jr6.onrender.com/';
+const BACKEND_URL = 'https://calypso-backend-6jr6.onrender.com';
 const socket = io(BACKEND_URL);
 
 function App() {
